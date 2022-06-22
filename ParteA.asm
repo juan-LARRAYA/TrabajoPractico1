@@ -1,92 +1,63 @@
-ParteA.asm
+;ParteA.asm
+
+.include "m328pdef.inc"
+
+ 
+; Defino las constantes del programa
+
+.equ LED_PORT_D = PORTD
+.equ LED_PIN = 2
+
+;ALIAS DE LOS REGISTROS.
+.def TEMP1 	= 	R18
+.def TEMP2 	= 	R19
+.def TEMP3 	= 	R20
+.def AUX 	= 	R21
 
 
-.include "m2560def.inc"
-
+;Inicio del codigo
 .cseg 
 .org 0x0000
-			jmp		main
+; Segmento de datos en memoria de codigo
 
-.org INT_VECTORS_SIZE
+; Se inicializa el Stack Pointer al final de la RAM utilizando la definicion global RAMEND
+	LDI		AUX,HIGH(RAMEND)
+	out		sph,AUX
+	LDI		AUX,LOW(RAMEND)
+	out		spl,AUX
+
+
+		
 main:
 			
-; Led en PB5 
-; Configuro puerto B
-			ldi		r20,0xf0	;(PORTB como salida)
-			out		DDRB,r20
+; Led en PD2 
+; Configuro puerto D
+			LDI		AUX,(1 << DDD2)	;(PORTD PD2  como salida) 
+			out		DDRD,AUX
 
 ; rutina de encendido y apagado
 		
-prendo:		sbi		PORTB,7 	; encendido del led  5=uno  7=mega
+prendo:		
+	SBI		LED_PORT_D, LED_PIN 	; encendido del led conectado en el pin 2 
 	
-
-demora1:
-			ldi 	r20,0x00
-			ldi 	r21,0x00
-			ldi		r22,0x3
-ciclo1:		inc		r20
-			cpi		r20,0xff
-			brlo	ciclo1
-			ldi		r20,0x00
-			inc		r21
-			cpi		r21,0xff
-			brlo	ciclo1
-			ldi		r21,0x00
-			inc		r22
-			cpi		r22,0x20
-			brlo	ciclo1
+	RCALL 	retardo_500ms			;espera
 			
-			
-			cbi		PORTB,7		; apagado del led
+	CBI		LED_PORT_D,LED_PIN		; apagado del led
 
-demora2:
-			ldi 	r20,0x00
-			ldi 	r21,0x00
-			ldi		r22,0x10
-ciclo2:		inc		r20
-			cpi		r20,0xff
-			brlo	ciclo2
-			ldi		r20,0x00
-			inc		r21
-			cpi		r21,0xff
-			brlo	ciclo2
-			ldi		r21,0x00
-			inc		r22
-			cpi		r22,0x20
-			brlo	ciclo2
+	RCALL 	retardo_500ms
 
+	RJMP	prendo		; reinicio el ciclo
 
-			RJMP	prendo		; reinicio el ciclo
-
-
-
-;HACER PARPADEAR EL LED CONECTADO EN EL PIN 2		(Usar la rutina de retardo Dada).
-
-
-;Realizar un informe con el diagrama esquemático del hardware, un diagrama en bloques del código y demás requisitos del informe (Informe.pdf)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+retardo_500ms: 
+	ldi r18, 21
+	ldi r19, 150
+	ldi r20, 128
+L1: 
+	dec r20
+	brne L1
+	dec r19
+	brne L1
+	dec r18
+	brne L1
+	ret
 
