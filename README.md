@@ -1,4 +1,4 @@
-# parpadear un LED - Primer TP de Laboratorio de microprocesadores
+# Parpadear un LED - Primer TP de Laboratorio de microprocesadores
 **1. Objetivo**
    
 El objetivo de este trabajo práctico es aprender acerca del uso y la
